@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "TurfRush",
+    "slug": "turftrush",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "turftrush",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#080c14"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.turftrush.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "TurfRush needs your location to claim territory as you move.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "TurfRush uses your location to track movement and claim territory."
+      }
+    },
+    "android": {
+      "package": "com.turftrush.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "TurfRush needs your location to claim territory as you move.",
+          "locationAlwaysPermission": "TurfRush tracks your movement to claim territory."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
