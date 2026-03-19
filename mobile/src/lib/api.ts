@@ -1,7 +1,11 @@
 import axios from 'axios';
+import Constants from 'expo-constants';
 import { useAuthStore } from './store';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Constants.expoConfig?.extra?.apiUrl as string) ||
+  'http://localhost:4000';
 
 const api = axios.create({ baseURL: BASE_URL });
 
