@@ -299,16 +299,6 @@ GET  /social/search?q=             Search users by username
 
 ---
 
-## ✏️ Renaming
-
-TurfRush is designed to be easy to rebrand. To rename:
-
-1. Replace `TurfRush` in `README.md` and `frontend/src/app/layout.tsx`
-2. Replace `turftrush-*` in both `package.json` files
-3. Update `POSTGRES_DB` in `docker-compose.yml` and `.env.example`
-
----
-
 <div align="center">
 
 Built with ⚡ · Inspired by Slither.io, Fog of World & Strava
