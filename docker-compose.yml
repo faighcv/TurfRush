@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: turfpass
       POSTGRES_DB: turfdb
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
