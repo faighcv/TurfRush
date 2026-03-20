@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import MapView, { Polygon, UrlTile, Marker, Region } from 'react-native-maps';
 import { territoryApi } from '@/lib/api';
 import { useAuthStore, useMapStore } from '@/lib/store';
-import { geoJsonToHexFeatures, hexToCoords, HexFeature } from '@/lib/h3utils';
+import { geoJsonToHexFeatures, HexFeature } from '@/lib/h3utils';
 
 const INITIAL_REGION = {
   latitude: 45.5017,
@@ -17,7 +17,6 @@ export default function TerritoryMap() {
   const { user } = useAuthStore();
   const { userLocation, territoryRefreshTick } = useMapStore();
   const [hexes, setHexes] = useState<HexFeature[]>([]);
-  const [region, setRegion] = useState<Region>(INITIAL_REGION);
 
   const loadTerritory = useCallback(async (r: Region) => {
     const latD = r.latitudeDelta / 2;
@@ -34,10 +33,9 @@ export default function TerritoryMap() {
   }, []);
 
   useEffect(() => {
-    loadTerritory(region);
+    loadTerritory(INITIAL_REGION);
   }, [territoryRefreshTick]);
 
-  // Pan to user when location updates
   useEffect(() => {
     if (userLocation && mapRef.current) {
       mapRef.current.animateToRegion({
@@ -53,40 +51,29 @@ export default function TerritoryMap() {
       ref={mapRef}
       style={StyleSheet.absoluteFillObject}
       initialRegion={INITIAL_REGION}
-      onRegionChangeComplete={(r) => {
-        setRegion(r);
-        loadTerritory(r);
-      }}
+      onRegionChangeComplete={(r) => loadTerritory(r)}
       showsUserLocation={false}
       showsCompass={false}
       showsScale={false}
       rotateEnabled={false}
       mapType="mutedStandard"
     >
-      {/* Dark OSM tile overlay */}
       <UrlTile
         urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maximumZ={19}
         opacity={0.35}
       />
 
-      {/* Territory hexagons */}
-      {hexes.map(hex => {
-        const coords = hexToCoords(hex.hexId);
-        if (!coords.length) return null;
-        const isOwn = hex.ownerId === user?.id;
-        return (
-          <Polygon
-            key={hex.hexId}
-            coordinates={coords}
-            fillColor={hex.color + (isOwn ? '70' : '45')}
-            strokeColor={hex.color + 'BB'}
-            strokeWidth={isOwn ? 2 : 1}
-          />
-        );
-      })}
+      {hexes.map(hex => (
+        <Polygon
+          key={hex.hexId}
+          coordinates={hex.coordinates}
+          fillColor={hex.color + (hex.ownerId === user?.id ? '70' : '45')}
+          strokeColor={hex.color + 'BB'}
+          strokeWidth={hex.ownerId === user?.id ? 2 : 1}
+        />
+      ))}
 
-      {/* User location dot */}
       {userLocation && (
         <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }}>
           <View style={[styles.dot, {
