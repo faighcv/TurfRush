@@ -14,7 +14,10 @@
       "bundleIdentifier": "com.turftrush.app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "TurfRush needs your location to claim territory as you move.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "TurfRush uses your location to track movement and claim territory."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "TurfRush uses your location to track movement and claim territory.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
