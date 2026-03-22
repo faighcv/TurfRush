@@ -37,4 +37,11 @@ export function notifyUser(userId, event, data) {
   io.to(`user:${userId}`).emit(event, data);
 }
 
+export function broadcastChallengeScore(challengeId, challengerId, opponentId, scores) {
+  if (!io) return;
+  const payload = { challengeId, ...scores };
+  io.to(`user:${challengerId}`).emit('challenge:score', payload);
+  io.to(`user:${opponentId}`).emit('challenge:score', payload);
+}
+
 export { io };

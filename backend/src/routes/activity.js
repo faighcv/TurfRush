@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { validateTrack } from '../services/anticheat.js';
 import { processTrack } from '../services/territoryEngine.js';
-import { broadcastTerritoryUpdate, notifyUser } from '../socket/index.js';
+import { broadcastTerritoryUpdate, notifyUser, broadcastChallengeScore } from '../socket/index.js';
+import { finalizeExpiredChallenges } from './challenges.js';
 import { query } from '../db/index.js';
 
 const router = Router();
@@ -73,6 +74,36 @@ router.post('/:activityId/points', requireAuth, async (req, res) => {
       broadcastTerritoryUpdate({ userId: req.user.id, hexes: territoryResult.totalNew });
     }
 
+    // Update active challenge score if user is in one
+    if (territoryResult.totalNew > 0) {
+      const challengeRes = await query(
+        `SELECT * FROM challenges
+         WHERE status = 'active' AND ends_at > NOW()
+         AND (challenger_id = $1 OR opponent_id = $1)
+         LIMIT 1`,
+        [req.user.id]
+      );
+      if (challengeRes.rows.length) {
+        const ch = challengeRes.rows[0];
+        const isChallenger = ch.challenger_id === req.user.id;
+        const col = isChallenger ? 'challenger_hexes' : 'opponent_hexes';
+        const distCol = isChallenger ? 'challenger_distance_m' : 'opponent_distance_m';
+
+        const updated = await query(
+          `UPDATE challenges
+           SET ${col} = ${col} + $1, ${distCol} = ${distCol} + $2
+           WHERE id = $3
+           RETURNING challenger_hexes, opponent_hexes`,
+          [territoryResult.totalNew, totalDistanceM, ch.id]
+        );
+        const scores = updated.rows[0];
+        broadcastChallengeScore(ch.id, ch.challenger_id, ch.opponent_id, {
+          challengerHexes: scores.challenger_hexes,
+          opponentHexes: scores.opponent_hexes,
+        });
+      }
+    }
+
     res.json({
       accepted: valid.length,
       rejected: invalid.length,
@@ -114,6 +145,9 @@ router.post('/:activityId/end', requireAuth, async (req, res) => {
         [req.user.id, JSON.stringify({ hexes: act.hexes_captured, stolen: act.hexes_stolen })]
       );
     }
+
+    // Finalize any challenges whose timer has expired
+    finalizeExpiredChallenges();
 
     // Notify user of activity summary
     notifyUser(req.user.id, 'activity:ended', {

@@ -63,3 +63,12 @@ export const socialApi = {
   acceptRequest: (id: string) => api.post(`/social/friends/${id}/accept`).then(r => r.data),
   search: (q: string) => api.get('/social/search', { params: { q } }).then(r => r.data),
 };
+
+export const challengeApi = {
+  my: () => api.get('/challenges/my').then(r => r.data),
+  get: (id: string) => api.get(`/challenges/${id}`).then(r => r.data),
+  create: (opponentId: string, durationMinutes: number) =>
+    api.post('/challenges', { opponentId, durationMinutes }).then(r => r.data),
+  accept: (id: string) => api.post(`/challenges/${id}/accept`).then(r => r.data),
+  cancel: (id: string) => api.post(`/challenges/${id}/cancel`).then(r => r.data),
+};

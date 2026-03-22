@@ -31,6 +31,10 @@ export default function TabsLayout() {
         options={{ title: 'Ranks', tabBarIcon: ({ color }) => <TabIcon emoji="🏆" color={color} /> }}
       />
       <Tabs.Screen
+        name="battle"
+        options={{ title: 'Battle', tabBarIcon: ({ color }) => <TabIcon emoji="⚔️" color={color} /> }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: 'Profile', tabBarIcon: ({ color }) => <TabIcon emoji="👤" color={color} /> }}
       />

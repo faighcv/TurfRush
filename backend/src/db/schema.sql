@@ -81,6 +81,27 @@ CREATE TABLE IF NOT EXISTS leaderboard_cache (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Challenges (timed friend competitions)
+CREATE TABLE IF NOT EXISTS challenges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  challenger_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  opponent_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  duration_minutes INT NOT NULL DEFAULT 30,
+  status VARCHAR(20) DEFAULT 'pending',   -- pending | active | completed | cancelled
+  started_at TIMESTAMPTZ,
+  ends_at TIMESTAMPTZ,
+  winner_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  challenger_hexes INT DEFAULT 0,
+  opponent_hexes INT DEFAULT 0,
+  challenger_distance_m FLOAT DEFAULT 0,
+  opponent_distance_m FLOAT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_challenge_challenger ON challenges(challenger_id);
+CREATE INDEX IF NOT EXISTS idx_challenge_opponent ON challenges(opponent_id);
+CREATE INDEX IF NOT EXISTS idx_challenge_status ON challenges(status);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_hex_owner ON hex_ownership(owner_id);
 CREATE INDEX IF NOT EXISTS idx_hex_activity ON hex_ownership(last_activity);

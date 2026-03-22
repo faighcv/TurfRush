@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import MapView, { Polygon, UrlTile, Marker, Region } from 'react-native-maps';
 import { territoryApi } from '@/lib/api';
 import { useAuthStore, useMapStore } from '@/lib/store';
@@ -56,7 +56,7 @@ export default function TerritoryMap() {
       showsCompass={false}
       showsScale={false}
       rotateEnabled={false}
-      mapType="mutedStandard"
+      mapType={Platform.OS === 'ios' ? 'mutedStandard' : 'standard'}
     >
       <UrlTile
         urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

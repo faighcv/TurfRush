@@ -84,3 +84,26 @@ export const useMapStore = create<MapState>((set) => ({
   territoryRefreshTick: 0,
   triggerRefresh: () => set(s => ({ territoryRefreshTick: s.territoryRefreshTick + 1 })),
 }));
+
+export interface ActiveChallenge {
+  id: string;
+  opponentUsername: string;
+  opponentColor: string;
+  endsAt: string;
+  myHexes: number;
+  opponentHexes: number;
+  isChallenger: boolean;
+}
+
+interface ChallengeState {
+  active: ActiveChallenge | null;
+  setActive: (c: ActiveChallenge | null) => void;
+  updateScore: (myHexes: number, opponentHexes: number) => void;
+}
+
+export const useChallengeStore = create<ChallengeState>((set) => ({
+  active: null,
+  setActive: (c) => set({ active: c }),
+  updateScore: (myHexes, opponentHexes) =>
+    set(s => s.active ? { active: { ...s.active, myHexes, opponentHexes } } : {}),
+}));
